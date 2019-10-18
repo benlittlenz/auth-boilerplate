@@ -5,13 +5,19 @@ import "reflect-metadata";
 import express from "express";
 import { ApolloServer } from "apollo-server-express";
 import { createConnection } from "typeorm";
+import cookieParser from "cookie-parser";
+import { verify } from "jsonwebtoken";
 
 (async () => {
   const app = express();
+  app.use(cookieParser());
+  app.get("/", (_req, res) => {
+    res.send("hidffs");
+  });
 
-  app.get('/', (_req, res) => {
-      res.send('hidffs')
-  })
+  app.post("/refresh_token", (req, res) => {
+    console.log(req.headers)
+  });
 
   await createConnection();
 
