@@ -7,6 +7,8 @@ import { ApolloServer } from "apollo-server-express";
 import { createConnection } from "typeorm";
 import cookieParser from "cookie-parser";
 import { verify } from "jsonwebtoken";
+import { User } from "./entity/User";
+import { createAccessToken } from "./auth";
 
 (async () => {
   const app = express();
@@ -15,8 +17,23 @@ import { verify } from "jsonwebtoken";
     res.send("hidffs");
   });
 
-  app.post("/refresh_token", (req, res) => {
-    console.log(req.headers)
+  app.post("/refresh_token", async (req, res) => {
+    const token = req.cookies.gdsfs;
+    if (!token) return res.send({ ok: false, accessToken: "" });
+    let payload: any = null;
+    try {
+      payload = verify(token, process.env.REFRESH_TOKEN_SECRET!);
+    } catch (err) {
+      console.log(err);
+      return res.send({ ok: false, accessToken: "" });
+    }
+
+    //if payload is valid, send back an access token
+    const user = await User.findOne({ id: payload.userId });
+    if(!user) {
+        return res.send({ ok: false, accessToken: "" });
+    }
+    return res.send({ ok: true, accessToken: createAccessToken(user) });
   });
 
   await createConnection();
