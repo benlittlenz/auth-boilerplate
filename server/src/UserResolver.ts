@@ -1,3 +1,4 @@
+import { Context } from "./Context";
 import {
   Resolver,
   Query,
@@ -5,9 +6,11 @@ import {
   Arg,
   Field,
   ObjectType,
+  Ctx,
 } from "type-graphql";
 import "reflect-metadata";
 import { hash, compare } from "bcryptjs";
+import { sign } from "jsonwebtoken";
 import { User } from "./entity/User";
 
 @ObjectType()
@@ -32,19 +35,31 @@ export class UserResolver {
   async login(
     @Arg("email") email: string,
     @Arg("password") password: string,
+    @Ctx() { res }: Context,
   ): Promise<LoginResponse> {
     const user = await User.findOne({ where: { email } });
 
     if (!user) throw new Error("No such user exists ");
 
-    const valid = compare(password, user.password);
+    const valid = await compare(password, user.password);
 
     if (!valid) throw new Error("Could not find user");
 
     //login successfull
 
+    res.cookie(
+      "gdsfs",
+      sign({ userId: user.id }, "qweeqwedas", {
+        expiresIn: "7d",
+      }), {
+          httpOnly: true
+      }
+    );
+
     return {
-      accessToken: "",
+      accessToken: sign({ userId: user.id }, "secrdfsdfset", {
+        expiresIn: "15m",
+      }),
     };
   }
 
