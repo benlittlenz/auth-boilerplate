@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { buildSchema } from "type-graphql";
 import { UserResolver } from "./UserResolver";
 import "reflect-metadata";

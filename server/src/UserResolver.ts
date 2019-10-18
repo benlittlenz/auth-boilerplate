@@ -1,3 +1,4 @@
+import { createRefreshToken, createAccessToken } from "./auth";
 import { Context } from "./Context";
 import {
   Resolver,
@@ -10,7 +11,6 @@ import {
 } from "type-graphql";
 import "reflect-metadata";
 import { hash, compare } from "bcryptjs";
-import { sign } from "jsonwebtoken";
 import { User } from "./entity/User";
 
 @ObjectType()
@@ -24,6 +24,11 @@ export class UserResolver {
   @Query(() => String)
   hello() {
     return "HI!!!";
+  }
+
+  @Query(() => String)
+  bye() {
+    return "byyeeee";
   }
 
   @Query(() => [User])
@@ -47,19 +52,12 @@ export class UserResolver {
 
     //login successfull
 
-    res.cookie(
-      "gdsfs",
-      sign({ userId: user.id }, "qweeqwedas", {
-        expiresIn: "7d",
-      }), {
-          httpOnly: true
-      }
-    );
+    res.cookie("gdsfs", createRefreshToken(user), {
+      httpOnly: true,
+    });
 
     return {
-      accessToken: sign({ userId: user.id }, "secrdfsdfset", {
-        expiresIn: "15m",
-      }),
+      accessToken: createAccessToken(user),
     };
   }
 
