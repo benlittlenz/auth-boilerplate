@@ -8,10 +8,12 @@ import {
   Field,
   ObjectType,
   Ctx,
+  UseMiddleware,
 } from "type-graphql";
 import "reflect-metadata";
 import { hash, compare } from "bcryptjs";
 import { User } from "./entity/User";
+import { isAuth } from "./isAuth";
 
 @ObjectType()
 class LoginResponse {
@@ -27,8 +29,10 @@ export class UserResolver {
   }
 
   @Query(() => String)
-  bye() {
-    return "byyeeee";
+  @UseMiddleware(isAuth)
+  bye(@Ctx() { payload }: Context) {
+      console.log(payload)
+    return `YOur id is ${payload!.userId}`;
   }
 
   @Query(() => [User])
