@@ -8,7 +8,7 @@ import { createConnection } from "typeorm";
 import cookieParser from "cookie-parser";
 import { verify } from "jsonwebtoken";
 import { User } from "./entity/User";
-import { createAccessToken } from "./auth";
+import { createAccessToken, createRefreshToken } from "./auth";
 
 (async () => {
   const app = express();
@@ -30,9 +30,19 @@ import { createAccessToken } from "./auth";
 
     //if payload is valid, send back an access token
     const user = await User.findOne({ id: payload.userId });
-    if(!user) {
-        return res.send({ ok: false, accessToken: "" });
+
+    if (!user) {
+      return res.send({ ok: false, accessToken: "" });
     }
+
+    if(user.tokenVersion !== payload.tokenVersion) {
+        return res.send({ ok: false, accessToken: "" }); 
+    }
+
+    res.cookie("gdsfs", createRefreshToken(user), {
+      httpOnly: true,
+    });
+
     return res.send({ ok: true, accessToken: createAccessToken(user) });
   });
 

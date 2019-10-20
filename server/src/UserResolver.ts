@@ -9,11 +9,13 @@ import {
   ObjectType,
   Ctx,
   UseMiddleware,
+  Int,
 } from "type-graphql";
 import "reflect-metadata";
 import { hash, compare } from "bcryptjs";
 import { User } from "./entity/User";
 import { isAuth } from "./isAuth";
+import { getConnection } from "typeorm";
 
 @ObjectType()
 class LoginResponse {
@@ -31,13 +33,21 @@ export class UserResolver {
   @Query(() => String)
   @UseMiddleware(isAuth)
   bye(@Ctx() { payload }: Context) {
-      console.log(payload)
+    console.log(payload);
     return `YOur id is ${payload!.userId}`;
   }
 
   @Query(() => [User])
   users() {
     return User.find();
+  }
+
+  @Mutation(() => Boolean)
+  async revokeRefreshTokens(@Arg("userId", () => Int) userId: number) {
+    await getConnection()
+      .getRepository(User)
+      .increment({ id: userId }, "tokenVersion", 1);
+    return true;
   }
 
   @Mutation(() => LoginResponse)
