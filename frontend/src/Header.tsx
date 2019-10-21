@@ -7,7 +7,7 @@ interface Props {}
 
 export const Header: React.FC<Props> = () => {
   const { data, loading } = useMeQuery();
-  const [logout, {client}] = useLogoutMutation()
+  const [logout, { client }] = useLogoutMutation();
 
   let body: any = null;
 
@@ -30,13 +30,19 @@ export const Header: React.FC<Props> = () => {
       <div>
         <Link to="/bye">Bye</Link>
       </div>
-      <div>
-        <button onClick={async () => {
-            await logout();
-            setAccessToken("")
-            await client!.resetStore();
-        }}>Logout</button>>
-      </div>
+      {!loading && data && data.me ? (
+        <div>
+          <button
+            onClick={async () => {
+              await logout();
+              setAccessToken("");
+              await client!.resetStore();
+            }}
+          >
+            Logout
+          </button>
+        </div>
+      ): null}
       {body}
     </header>
   );

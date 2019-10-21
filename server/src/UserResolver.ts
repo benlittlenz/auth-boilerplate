@@ -95,6 +95,7 @@ export class UserResolver {
 
     res.cookie("gdsfs", createRefreshToken(user), {
       httpOnly: true,
+      path: "/refresh_token"
     });
 
     return {

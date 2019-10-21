@@ -46,6 +46,7 @@ import { createAccessToken, createRefreshToken } from "./auth";
 
     res.cookie("gdsfs", createRefreshToken(user), {
       httpOnly: true,
+      path: "/refresh_token"
     });
 
     return res.send({ ok: true, accessToken: createAccessToken(user) });
