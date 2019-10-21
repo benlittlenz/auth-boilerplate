@@ -16,6 +16,7 @@ import { hash, compare } from "bcryptjs";
 import { User } from "./entity/User";
 import { isAuth } from "./isAuth";
 import { getConnection } from "typeorm";
+import { verify } from "jsonwebtoken";
 
 @ObjectType()
 class LoginResponse {
@@ -40,6 +41,24 @@ export class UserResolver {
   @Query(() => [User])
   users() {
     return User.find();
+  }
+
+  @Query(() => User, { nullable: true })
+  me(@Ctx() context: Context) {
+    const authorization = context.req.headers["authorization"];
+
+    if (!authorization) {
+      return null;
+    }
+
+    try {
+      const token = authorization.split(" ")[1];
+      const payload: any = verify(token, process.env.ACCESS_TOKEN_SECRET!);
+      return User.findOne(payload.userId);
+    } catch (err) {
+      console.log(err);
+      return null;
+    }
   }
 
   @Mutation(() => Boolean)
