@@ -6,12 +6,17 @@ import express from "express";
 import { ApolloServer } from "apollo-server-express";
 import { createConnection } from "typeorm";
 import cookieParser from "cookie-parser";
+import cors from "cors";
 import { verify } from "jsonwebtoken";
 import { User } from "./entity/User";
 import { createAccessToken, createRefreshToken } from "./auth";
 
 (async () => {
   const app = express();
+  app.use(cors({
+    origin: "http://localhost:3000",
+    credentials: true
+  }))
   app.use(cookieParser());
   app.get("/", (_req, res) => {
     res.send("hidffs");
@@ -35,8 +40,8 @@ import { createAccessToken, createRefreshToken } from "./auth";
       return res.send({ ok: false, accessToken: "" });
     }
 
-    if(user.tokenVersion !== payload.tokenVersion) {
-        return res.send({ ok: false, accessToken: "" }); 
+    if (user.tokenVersion !== payload.tokenVersion) {
+      return res.send({ ok: false, accessToken: "" });
     }
 
     res.cookie("gdsfs", createRefreshToken(user), {
@@ -55,7 +60,7 @@ import { createAccessToken, createRefreshToken } from "./auth";
     context: ({ req, res }) => ({ req, res }),
   });
 
-  apolloServer.applyMiddleware({ app });
+  apolloServer.applyMiddleware({ app, cors: false });
 
   app.listen(4000, () => {
     console.log("server running");
