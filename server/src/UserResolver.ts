@@ -22,6 +22,9 @@ import { verify } from "jsonwebtoken";
 class LoginResponse {
   @Field()
   accessToken: string;
+
+  @Field(() => User)
+  user: User;
 }
 
 @Resolver()
@@ -60,6 +63,11 @@ export class UserResolver {
       return null;
     }
   }
+  @Mutation(() => Boolean)
+  async logout(@Ctx() {res}: Context) {
+    res.cookie("gdsfs", "");
+    return true;
+  }
 
   @Mutation(() => Boolean)
   async revokeRefreshTokens(@Arg("userId", () => Int) userId: number) {
@@ -91,6 +99,7 @@ export class UserResolver {
 
     return {
       accessToken: createAccessToken(user),
+      user
     };
   }
 
