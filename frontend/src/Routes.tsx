@@ -3,7 +3,7 @@ import { BrowserRouter, Switch, Route, Link } from "react-router-dom";
 import { Home } from "./pages/Home";
 import { Register } from "./pages/Register";
 import { Login } from "./pages/Login";
-import { Bye } from "./pages/Bye";
+import { Bye } from "./Bye";
 
 export const Routes: React.FC = () => {
   return (
