@@ -50,9 +50,8 @@ export class UserResolver {
   me(@Ctx() context: Context) {
     const authorization = context.req.headers["authorization"];
 
-    if (!authorization) {
-      return null;
-    }
+    if (!authorization) return null;
+    
 
     try {
       const token = authorization.split(" ")[1];
